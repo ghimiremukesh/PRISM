@@ -173,4 +173,24 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 	1346|  # self.sc_weight = (1 - (self.state.global_step / self.state.max_steps)) ** 2  # decay the \gamma
 	```
 	
+### DETAILS FOR EVALUATION
+
+- For evaluation on math performance, use the following template as a reference (also available on `Intuitor/mukesh_test/script_for_eval.txt`). Lighteval package should already be installed with the `openr1` environment. If not, you can do so with `pip install lighteval` or via your preferred package manager. 
+	```
+	export VLLM_WORKER_MULTIPROC_METHOD=spawn
+	export MODEL=Qwen/Qwen2.5-3B ## or your local model path
+	export MODEL_ARGS="model_name=$MODEL,dtype=bfloat16,gpu_memory_utilization=0.8,data_parallel_size=1,max_model_length=32768,generation_parameters={max_new_tokens:4096,temperature:0}"
+	export OUTPUT_DIR=./results/
+	export TASKA=math_500
+	export TASKB=aime24
+	export TASKC=gsm8k
+	export N=0
+	lighteval vllm $MODEL_ARGS "lighteval|$TASKA|$N|0,lighteval|$TASKB|$N|0,lighteval|$TASKC|$N|0" \
+		--use-chat-template \
+		--output-dir $OUTPUT_DIR \
+		--save-details
+	```
+
+- For evaluation on code generation, clone the repo: [LiveCodeBench](https://github.com/LiveCodeBench/LiveCodeBench) and follow the instructions therein. 
+
 
