@@ -149,5 +149,28 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 	```
 
 
+### ADVANTAGE COMPUTATION FOR PRISM
+
+- The advantage is compute in the file `open-r1-intuitor/src/open_r1/decay_intuitor_prm_trainer.py` inside the function `_generate_and_score_completions` in lines `1306-1352`. It follows similar logic as in GRPO or INTUITOR's advantage computation. 
+
+- The `advantages` in line `1348` computes the advantage for the reward functions specified in `reward_funcs` in the config file that have their respective `reward_weights > 0`. If all `reward_weights` are equal to zero, `advantages` is simply as matrix of zeros. 
+	```
+	1348| sce_advantage = sce_advantage + advantages
+	```
+- The final advantage that is used in downstream loss computation is then computed as the following depending on if `include_intuitor` is `True` or `False`
+	```
+	1325| if self.include_intuitor:
+			... 
+			# all previous computations 
+			...
+
+	1350|	final_advantage = self.sc_weight * sce_advantage + prm_advantages[process_slice]
+	1351| else:
+	1352|	final_advantages = prm_advantages[process_slice]
+	```
+- The weight $\gamma$ can be specified as a constant in the `__init__` as `self.sc_weight = 1.0` (line 407). To use a decaying $\gamma$ based on training iterations, uncomment the line `1346`:
+	```
+	1346|  # self.sc_weight = (1 - (self.state.global_step / self.state.max_steps)) ** 2  # decay the \gamma
+	```
 	
 
