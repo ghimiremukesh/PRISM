@@ -1345,11 +1345,11 @@ class INTUITORTrainer(Trainer):
 
             # self.sc_weight = (1 - (self.state.global_step / self.state.max_steps)) ** 2  # decay the sc contibution to advantage
 
-            sce_advantage = sce_advantage + advantages
+            # sce_advantage = sce_advantage + advantage ## do this below so that it is clean.
             
-            final_advantage = self.sc_weight * sce_advantage + prm_advantages[process_slice]
+            final_advantage = self.sc_weight * sce_advantage + prm_advantages[process_slice] + advantages
         else:
-            final_advantage = prm_advantages[process_slice]
+            final_advantage = prm_advantages[process_slice] + advantages ## add advantages if we want to use additional format rewards with PRISM.
         
         # Log the metrics
         if mode == "train":
@@ -1627,3 +1627,4 @@ class INTUITORTrainer(Trainer):
         )
 
         model_card.save(os.path.join(self.args.output_dir, "README.md"))
+
