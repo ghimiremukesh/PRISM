@@ -32,6 +32,7 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 		```
 		683|  self.prm_client = VLLMClient(args.prm_server_host, 8081, connection_timeout=args.vllm_server_timeout)
 		```
+  	- Also replace the `trl/scripts/vllm_serve.py` with `assets/vllm_serve.py`
 
 ### CONFIG FILE DETAILS
 - All configs are inside `open-r1-intuitor/recipes`, and contains parameters such as `model`, `dataset`, `learning_rate`, `kl_penalty`, `num_generations`, `gradient_accumulation_steps`, `per_device_train_batch_size`, and so on.
