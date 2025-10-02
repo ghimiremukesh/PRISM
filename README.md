@@ -1,3 +1,6 @@
+# Code for PRISM: A Unified Framework for Post-Training LLMs Without Verifiable Rewards 
+
+
 ## INSTRUCTIONS FOR OPEN-R1 
 
 Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) for installing the environment. Once that is completed, follow the guidelines below for setting up PRISM and other related information regarding PRISM. 
