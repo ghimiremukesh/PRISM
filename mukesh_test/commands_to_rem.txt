@@ -1,4 +1,0 @@
-ss -ltnp | grep :8000  # clear the port for vllm
-
-ps aux | grep "/users/mghmr" | grep -v grep | awk '{print $2}' | xargs kill -9
-

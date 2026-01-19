@@ -1,11 +1,26 @@
 # Code for PRISM: A Unified Framework for Post-Training LLMs Without Verifiable Rewards 
 
+Paper: https://arxiv.org/pdf/2601.04700
+
+### Citation
+<hr>
+
+```
+@misc{ghimire2026prismunifiedframeworkposttraining,
+      title={PRISM: A Unified Framework for Post-Training LLMs Without Verifiable Rewards}, 
+      author={Mukesh Ghimire and Aosong Feng and Liwen You and Youzhi Luo and Fang Liu and Xuan Zhu},
+      year={2026},
+      eprint={2601.04700},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2601.04700}, 
+}
+```
 
 ## INSTRUCTIONS FOR OPEN-R1 
 
 Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) for installing the environment. Once that is completed, follow the guidelines below for setting up PRISM and other related information regarding PRISM. 
 
----
 ---
 
 ## INSTRUCTIONS FOR PRISM
@@ -24,18 +39,6 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 - The implementation of RLIF methods and PRISM are in `open-r1-intuitor/src/open_r1`
 	- The first point of entry for each of the methods is the file in the form `{method}.py` (e.g., `intuitor.py`, `grpo.py`, `decay_intuitor_prm.py`, ...)
 		- These modules then call `{method}_trainer.py`, which contains the **advantage computation**, **prompts processing** and **logging**. Example files: `intuitor_trainier.py`, `decay_intuitor_prm_trainer.py`, `token_entropy_trainer.py`, ...
-
-
-### IMPORTANT NOTE:
-- Since PRISM requires loading two models: one for training and the other for PRM rewards, we need to make some additional changes. 
-	- change the `vllm_client.py` in the `trl` package installed in your environment. 
-		- locate the `trl` package. Replace the `your_env_location/lib/python_3.11/site-packages/trl/extras/vllm_client.py` with `open-r1-intuitor/assests/vllm_client_backup.py`
-		- rename it back to `vllm_client.py`
-	- PRM model's communication currently occurs via port `8081` manually hard-coded in line `683` in `open-r1-intuitor/src/open_r1/decay_intuitor_prm_trainer.py`:  
-		```
-		683|  self.prm_client = VLLMClient(args.prm_server_host, 8081, connection_timeout=args.vllm_server_timeout)
-		```
-  	- Also replace the `trl/scripts/vllm_serve.py` with `assets/vllm_serve.py`
 
 ### CONFIG FILE DETAILS
 - All configs are inside `open-r1-intuitor/recipes`, and contains parameters such as `model`, `dataset`, `learning_rate`, `kl_penalty`, `num_generations`, `gradient_accumulation_steps`, `per_device_train_batch_size`, and so on.
@@ -179,14 +182,13 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 	
 ### DETAILS FOR EVALUATION
 
-- For evaluation on math performance, use the following template as a reference (also available on `Intuitor/mukesh_test/script_for_eval.txt`). Lighteval package should already be installed with the `openr1` environment. If not, you can do so with `pip install lighteval` or via your preferred package manager. 
+- For evaluation on math performance, use the following template as a reference. Lighteval package should already be installed with the `openr1` environment. If not, you can do so with `pip install lighteval` or via your preferred package manager. 
 	```
 	export VLLM_WORKER_MULTIPROC_METHOD=spawn
 	export MODEL=Qwen/Qwen2.5-3B ## or your local model path
 	export MODEL_ARGS="model_name=$MODEL,dtype=bfloat16,gpu_memory_utilization=0.8,data_parallel_size=1,max_model_length=32768,generation_parameters={max_new_tokens:4096,temperature:0}"
 	export OUTPUT_DIR=./results/
 	export TASKA=math_500
-	export TASKB=aime24
 	export TASKC=gsm8k
 	export N=0
 	lighteval vllm $MODEL_ARGS "lighteval|$TASKA|$N|0,lighteval|$TASKB|$N|0,lighteval|$TASKC|$N|0" \
@@ -196,5 +198,15 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 	```
 
 - For evaluation on code generation, clone the repo: [LiveCodeBench](https://github.com/LiveCodeBench/LiveCodeBench) and follow the instructions therein. 
+
+
+## REFERENCES
+
+----
+
+This work is possible due to the following repos:
+
+- [Intuitor](https://github.com/sunblaze-ucb/Intuitor)
+- [GenPRM](https://github.com/RyanLiu112/GenPRM)
 
 

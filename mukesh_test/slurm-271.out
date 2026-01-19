@@ -1,15 +1,0 @@
-Sliding Window Attention is enabled but not implemented for `sdpa`; unexpected results may be encountered.
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:11<00:34, 11.49s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:22<00:22, 11.32s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:33<00:11, 11.26s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:39<00:00,  9.15s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:39<00:00,  9.95s/it]
-Device set to use cuda:0
-Drafts:   0%|          | 0/8 [00:00<?, ?it/s]/fsx/ubuntu/users/mghmr/Intuitor/open-r1-intuitor/openr1/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.0` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
-  warnings.warn(
-/fsx/ubuntu/users/mghmr/Intuitor/open-r1-intuitor/openr1/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:641: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.8` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
-  warnings.warn(
-/fsx/ubuntu/users/mghmr/Intuitor/open-r1-intuitor/openr1/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:658: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `20` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
-  warnings.warn(
-Drafts:  12%|█▎        | 1/8 [00:43<05:06, 43.76s/it]Drafts:  25%|██▌       | 2/8 [01:48<05:37, 56.33s/it]Drafts:  38%|███▊      | 3/8 [02:37<04:24, 52.86s/it]Drafts:  50%|█████     | 4/8 [03:41<03:49, 57.32s/it]Drafts:  62%|██████▎   | 5/8 [04:18<02:29, 49.94s/it]Drafts:  75%|███████▌  | 6/8 [07:13<03:04, 92.49s/it]Drafts:  88%|████████▊ | 7/8 [07:53<01:15, 75.29s/it]Drafts: 100%|██████████| 8/8 [08:49<00:00, 69.07s/it]Drafts: 100%|██████████| 8/8 [08:49<00:00, 66.17s/it]
-Critiques:   0%|          | 0/8 [00:00<?, ?it/s]Critiques:  12%|█▎        | 1/8 [00:27<03:11, 27.36s/it]Critiques:  25%|██▌       | 2/8 [01:13<03:50, 38.44s/it]You seem to be using the pipelines sequentially on GPU. In order to maximize efficiency please use a dataset
-Critiques:  38%|███▊      | 3/8 [01:55<03:20, 40.12s/it]Critiques:  50%|█████     | 4/8 [02:55<03:11, 47.94s/it]Critiques:  62%|██████▎   | 5/8 [03:27<02:06, 42.19s/it]Critiques:  75%|███████▌  | 6/8 [07:28<03:39, 109.65s/it]Critiques:  88%|████████▊ | 7/8 [08:09<01:27, 87.17s/it] Critiques: 100%|██████████| 8/8 [08:48<00:00, 72.00s/it]Critiques: 100%|██████████| 8/8 [08:48<00:00, 66.08s/it]
-Revisions:   0%|          | 0/1 [00:00<?, ?it/s]Revisions: 100%|██████████| 1/1 [00:02<00:00,  2.35s/it]Revisions: 100%|██████████| 1/1 [00:02<00:00,  2.35s/it]
-Saved 30 rows to critique_tests/outputs.csv (dataset: yentinglin/aime_2025/train).
-TensorBoard logs written to critique_tests
