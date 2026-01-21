@@ -204,8 +204,6 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 
 ## REFERENCES
 
-----
-
 This work is possible due to the following repos:
 
 - [Intuitor](https://github.com/sunblaze-ucb/Intuitor)
