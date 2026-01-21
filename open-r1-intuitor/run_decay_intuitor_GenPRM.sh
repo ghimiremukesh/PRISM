@@ -1,16 +1,6 @@
 #!/usr/bin/bash
 source ./openr1/bin/activate
-export WANDB_API_KEY=6690ae4dd209ea0517d035d7efd9c428ba921922
-
-# export DATABRICKS_HOST=https://dbc-3eec905e-05ea.cloud.databricks.com
-# export DATABRICKS_TOKEN=dapi50c72486dd38244730fce9eb9b87f5d6
-# export MLFLOW_TRACKING_URI=databricks
-# export MLFLOW_REGISTRY_URI=databricks-uc
-# export MLFLOW_EXPERIMENT_ID=1799336443725747
-# export ACCELERATE_LOG_LEVEL=info
-
-
-export HF_TOKEN=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
+export WANDB_API_KEY= # your_wandb_api_key_here
 
 # Array to store all PIDs
 declare -a PIDS=()
@@ -27,8 +17,8 @@ cleanup() {
         fi
     done
     
-    # Additional cleanup for any remaining processes
-    ps aux | grep "/users/mghmr" | grep -v grep | awk '{print $2}' | xargs kill -9 2>/dev/null
+    # Additional cleanup for any remaining processes | customize the path as needed
+    ps aux | grep "/users/your_username" | grep -v grep | awk '{print $2}' | xargs kill -9 2>/dev/null
     echo "Cleanup completed."
     exit 1
 }
@@ -56,7 +46,7 @@ monitor_process() {
 }
 
 # Run vllm-serve in the background with nohup
-nohup env CUDA_VISIBLE_DEVICES=0 trl vllm-serve --model "HuggingFaceTB/SmolLM3-3B" > vllm-serve-prm.log 2>&1 &
+nohup env CUDA_VISIBLE_DEVICES=0 trl vllm-serve --model "Qwen2.5-3B" > vllm-serve-prm.log 2>&1 &
 VLLM_PID=$!
 PIDS+=($VLLM_PID)
 echo "vLLM server started with PID: $VLLM_PID"

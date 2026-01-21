@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=mghmr-Qwen2.5-7B-INT-DAPO
+#SBATCH --job-name=Qwen2.5-7B-INT-DAPO
 #SBATCH --ntasks-per-node=1
 #SBATCH --exclusive
 #SBATCH --gres=gpu:8
@@ -9,9 +9,7 @@
 #SBATCH --requeue
 
 
-export WANDB_API_KEY=6690ae4dd209ea0517d035d7efd9c428ba921922 #optional
-
-export HF_TOKEN=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
+export WANDB_API_KEY= #your_wandb_api_key_here
 
 # Specific configuration optimized for the Hugging Face Compute Cluster
 # module load cuda/12.4
@@ -25,8 +23,7 @@ echo "START TIME: $(date)"
 CONFIG_SUFFIX=$1
 ACCELERATOR=$2
 OPTIONAL_ARGS=$3
-# CONFIG_FILE=/fsx/ubuntu/users/mghmr/Intuitor/open-r1-intuitor/recipes/Qwen2.5-3B/intuitor-critique/config_demo.yaml
-CONFIG_FILE=/fsx/ubuntu/users/mghmr/Intuitor/open-r1-intuitor/recipes/Qwen2.5-7B/intuitor/config_demo.yaml
+CONFIG_FILE=~/open-r1-intuitor/recipes/Qwen2.5-7B/intuitor/config_demo.yaml
 
 GRAD_ACC_STEPS=$(grep 'gradient_accumulation_steps:' $CONFIG_FILE | awk '{print $2}')
 # MODEL=$(grep 'model_name_or_path:' $CONFIG_FILE | awk '{print $2}')

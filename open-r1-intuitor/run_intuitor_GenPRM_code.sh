@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 source ./openr1/bin/activate
-export WANDB_API_KEY=6690ae4dd209ea0517d035d7efd9c428ba921922
+export WANDB_API_KEY= # your_wandb_api_key_here
 export ACCELERATE_LOG_LEVEL=info
 
 # Array to store all PIDs
@@ -19,7 +19,7 @@ cleanup() {
     done
     
     # Additional cleanup for any remaining processes
-    ps aux | grep "/users/mghmr" | grep -v grep | awk '{print $2}' | xargs kill -9 2>/dev/null
+    ps aux | grep "/users/your_username" | grep -v grep | awk '{print $2}' | xargs kill -9 2>/dev/null
     echo "Cleanup completed."
     exit 1
 }

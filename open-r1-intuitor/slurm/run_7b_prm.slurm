@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=mghmr-PRM-INT-DAPO
+#SBATCH --job-name=PRM-INT-DAPO
 #SBATCH --ntasks-per-node=1
 #SBATCH --exclusive
 #SBATCH --gres=gpu:8
@@ -8,19 +8,7 @@
 #SBATCH --error=./logs_slurm/%x-%j.err
 #SBATCH --requeue
 
-export WANDB_API_KEY=6690ae4dd209ea0517d035d7efd9c428ba921922 #optional
-
-# export WANDB_MODE=disabled
-
-export DATABRICKS_HOST=https://dbc-3eec905e-05ea.cloud.databricks.com
-export DATABRICKS_TOKEN=dapi50c72486dd38244730fce9eb9b87f5d6
-export MLFLOW_TRACKING_URI=databricks
-export MLFLOW_REGISTRY_URI=databricks-uc
-export MLFLOW_EXPERIMENT_ID=1799336443725747
-
-export HF_MLFLOW_LOG_ARTIFACTS=true  # Log model artifacts
-
-export HF_TOKEN=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
+export WANDB_API_KEY= # your_wandb_api_key_here
 
 # Specific configuration optimized for the Hugging Face Compute Cluster
 # module load cuda/12.4
@@ -35,7 +23,7 @@ CONFIG_SUFFIX=$1
 ACCELERATOR=$2
 OPTIONAL_ARGS=$3
 # CONFIG_FILE=/fsx/ubuntu/users/mghmr/Intuitor/open-r1-intuitor/recipes/Qwen2.5-3B/intuitor-critique/config_demo.yaml
-CONFIG_FILE=/fsx/ubuntu/users/mghmr/Intuitor/open-r1-intuitor/recipes/Qwen2.5-7B/prm/config_genprm_sc.yaml
+CONFIG_FILE=~/open-r1-intuitor/recipes/Qwen2.5-7B/prm/config_genprm_sc.yaml
 
 GRAD_ACC_STEPS=$(grep 'gradient_accumulation_steps:' $CONFIG_FILE | awk '{print $2}')
 MODEL=$(grep 'model_name_or_path:' "$CONFIG_FILE" | awk '{print $2}' | tr -d '\r')

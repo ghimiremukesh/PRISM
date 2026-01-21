@@ -1,7 +1,6 @@
 #!/usr/bin/bash
 source ./openr1/bin/activate
-export WANDB_API_KEY=6690ae4dd209ea0517d035d7efd9c428ba921922
-export ACCELERATE_LOG_LEVEL=info
+export WANDB_API_KEY= # your_wandb_api_key_here
 
 # Run vllm-serve in the background with nohup
 nohup env CUDA_VISIBLE_DEVICES=0 trl vllm-serve --model "Qwen/Qwen2.5-3B" > vllm-serve-token_ent.log 2>&1 &
@@ -27,5 +26,5 @@ else
 fi
 
 # Clean up all processes
-ps aux | grep "/users/mghmr" | grep -v grep | awk '{print $2}' | xargs kill -9
+ps aux | grep "/users/your_username" | grep -v grep | awk '{print $2}' | xargs kill -9
 echo "Cleanup completed."
