@@ -3,7 +3,6 @@
 Paper: https://arxiv.org/pdf/2601.04700
 
 ### Citation
-<hr>
 
 ```
 @misc{ghimire2026prismunifiedframeworkposttraining,
@@ -101,7 +100,7 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 
 ### ADDITIONAL REWARD FUNCTION
 
-- Following additional reward that checks whether or not the model's generation has boxed answers is implemented in the `open-r1-intuitor/src/open_r1/rewards.py` in line 99:
+- The following additional reward that checks whether or not the model's generation has boxed answers is implemented in the `open-r1-intuitor/src/open_r1/rewards.py` in line 99:
 	```
 	# reward function for rewarding boxed answer 
 	def boxed_reward(completions, **kwargs):
@@ -160,7 +159,7 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 
 ### ADVANTAGE COMPUTATION FOR PRISM
 
-- The advantage is compute in the file `open-r1-intuitor/src/open_r1/decay_intuitor_prm_trainer.py` inside the function `_generate_and_score_completions` in lines `1306-1352`. It follows similar logic as in GRPO or INTUITOR's advantage computation. 
+- The advantage is computed in the file `open-r1-intuitor/src/open_r1/decay_intuitor_prm_trainer.py` inside the function `_generate_and_score_completions` in lines `1306-1352`. It follows similar logic as in GRPO or INTUITOR's advantage computation. 
 
 - The `advantages` in line `1348` computes the advantage for the reward functions specified in `reward_funcs` in the config file that have their respective `reward_weights > 0`. If all `reward_weights` are equal to zero, `advantages` is simply as matrix of zeros. 
 	```
