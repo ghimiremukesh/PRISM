@@ -17,6 +17,7 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 	- RLIF: Token-Entropy: `run_token_entropy.sh`
 	- RLIF: Trajectory-Entropy: `run_traj_entropy.sh`
 	- GRPO (with GT): `run_grpo.sh`
+	- Majority-Vote (TTRL-style, label-free): `run_majority_vote.sh`
 	- PRISM: `run_decay_intuitor_GenPRM.sh`
 
 - Training configs are in `open-r1-intuitor/recipes`. Each model has config files for each of the training methods. 
@@ -53,6 +54,29 @@ Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) 
 
 - For GRPO (w/ ground-truth) training, set the `reward_funcs` to `accuracy` with `reward_weights` set to `1.0`.
 - For INTUITOR and PRISM training, set the `reward_funcs` to `accuracy` with `reward_weights` set to `0.0` so that it is only used for monitoring and not learning. 
+
+### MAJORITY-VOTE (TTRL-STYLE) BASELINE
+
+A label-free self-consistency baseline: no ground-truth solution, PRM, or self-certainty signal is used for learning. For each prompt, the final answers of all `num_generations` sampled completions are parsed and clustered by mathematical equivalence (via `math_verify`); the plurality answer becomes a pseudo-label, and completions matching it get reward 1.0 (else 0.0). Training itself is vanilla GRPO (stock trl `GRPOTrainer` via `src/open_r1/grpo.py`) — only the reward differs.
+
+- Reward implementation: `get_majority_vote_reward` in `open-r1-intuitor/src/open_r1/rewards.py` (registered as `majority_vote`).
+- Config: set `reward_funcs` to `majority_vote` with weight `1.0`; keep `accuracy` at weight `0.0` to log true accuracy without training on it:
+	```
+	reward_funcs:
+	- majority_vote
+	- accuracy
+	reward_weights:
+	- 1.0  # majority-vote pseudo-label (the learning signal)
+	- 0.0  # ground-truth accuracy: monitoring only
+	majority_vote_min_agreement: 0.0
+	```
+- `majority_vote_min_agreement` (float in [0, 1], default 0.0): minimum fraction of a group's parseable votes the plurality answer must reach for the pseudo-label to be trusted; if not reached, the whole group receives 0.0 (no gradient signal for that prompt).
+- Launch scripts:
+	- Single node: `run_majority_vote.sh` (Qwen2.5-3B on MATH; vLLM on GPU 0, training on GPUs 1-7). No GenPRM server is needed.
+	- 2-node slurm: `slurm/run_majority_vote.slurm` (Qwen2.5-3B / MATH), `slurm/run_7b_majority_vote.slurm` (Qwen2.5-7B / DAPO-17k), `slurm/run_7b_majority_vote_olmo3.slurm` (Olmo-3-7B-Instruct / DAPO-17k). One node serves vLLM, the other trains with ZeRO-3.
+- Recipes: `recipes/{Qwen2.5-3B,Qwen2.5-7B,Olmo3-7B}/majority_vote/config_majority_vote.yaml`.
+- Note on Olmo-3: the `olmo3` architecture requires a newer stack (`trl>=0.29`, `transformers>=4.57`, `vllm>=0.11`) than the pinned environment; use a separate venv for that run. Its config pins `loss_type: bnpo` and `scale_rewards: true` to match the older trl semantics used by the Qwen baselines.
+- Tests: `tests/test_majority_vote_reward.py` (synthetic) and `tests/test_majority_vote_reward_real.py` (real completions).
 
 ### DETAILS ON GenPRM
 
