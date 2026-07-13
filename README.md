@@ -1,20 +1,4 @@
-# Code for PRISM: A Unified Framework for Post-Training LLMs Without Verifiable Rewards 
-
-Paper: https://arxiv.org/pdf/2601.04700
-
-### Citation
-
-```
-@misc{ghimire2026prismunifiedframeworkposttraining,
-      title={PRISM: A Unified Framework for Post-Training LLMs Without Verifiable Rewards}, 
-      author={Mukesh Ghimire and Aosong Feng and Liwen You and Youzhi Luo and Fang Liu and Xuan Zhu},
-      year={2026},
-      eprint={2601.04700},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2601.04700}, 
-}
-```
+# Code for Stabilizing Post-Training without Task-Verifiable Rewards via Process Rewards and Internal Confidence
 
 ## INSTRUCTIONS FOR OPEN-R1 
 
