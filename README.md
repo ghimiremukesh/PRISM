@@ -4,8 +4,6 @@
 
 Please follow the guidelines in the file [`OPENR1_README.md`](OPENR1_README.md) for installing the environment. Once that is completed, follow the guidelines below for setting up PRISM and other related information regarding PRISM. 
 
-*Note: When you install open-r1 environment as outlined above, it automatically installs a modified [trl](https://github.com/ghimiremukesh/trl.git) to support PRISM training.*
-
 ---
 
 ## INSTRUCTIONS FOR PRISM
