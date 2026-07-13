@@ -1,6 +1,6 @@
 #!/bin/bash
 source ./openr1/bin/activate
-export WANDB_API_KEY=6aa6f9ef7e3680b05cbf8e44c9a53590729c00a9
+export WANDB_API_KEY= # your_wandb_api_key_here
 export ACCELERATE_LOG_LEVEL=info
 
 # Run vllm-serve in the background with nohup

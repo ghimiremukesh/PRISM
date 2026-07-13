@@ -1,0 +1,76 @@
+# Majority-vote (TTRL-style self-consistency) baseline — Olmo-3-7B-Instruct on DAPO.
+# Label-free: ground-truth solution is NOT used as a reward signal.
+# Plurality vote over num_generations samples forms a pseudo-label;
+# completions matching it get reward 1.0, else 0.0.
+# Uses vanilla GRPO (stock trl GRPOTrainer via src/open_r1/grpo.py).
+#
+# NOTE: olmo3 architecture needs the openr1-olmo3 venv (trl 0.29 / transformers
+# 4.57 / vllm 0.11), not the default openr1 venv. Field names follow trl 0.29
+# (dtype, no max_prompt_length); loss_type/scale_rewards are pinned to the old
+# trl 0.18 defaults so this baseline matches the Qwen2.5-7B majority-vote run.
+#
+# Batch size math (matches existing 7B GRPO config for 2-node: 1 vLLM, 1 train):
+#   2 × 8 GPUs × 64 grad_acc = 1024 completions/step → 64 prompts (÷ num_generations=16)
+
+# Model arguments
+model_name_or_path: allenai/Olmo-3-7B-Instruct
+model_revision: main
+dtype: bfloat16
+attn_implementation: flash_attention_2
+
+# Data training arguments
+dataset_name: open-r1/DAPO-Math-17k-Processed
+dataset_config: en
+dataset_prompt_column: prompt
+system_prompt: "You are a helpful AI Assistant, designed to provided well-reasoned and detailed responses. You FIRST think about the reasoning process step by step and then provide the user with the answer. Please enclose your final answer in the box: \\boxed{Your Answer}. Please stop generation immediately after outputing the box."
+
+# GRPO trainer config
+bf16: true
+beta: 0.005 # kl penalty
+loss_type: bnpo      # trl 0.29 default changed to dapo; pin old 0.18 default
+scale_rewards: true  # trl 0.29 default changed to "group"; pin old 0.18 default
+use_vllm: true
+vllm_server_port: 8001
+vllm_server_timeout: 600
+do_eval: false
+gradient_accumulation_steps: 64
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+hub_strategy: every_save
+learning_rate: 1.0e-06
+log_completions: true
+log_level: info
+logging_first_step: true
+logging_steps: 5
+logging_strategy: steps
+lr_scheduler_type: cosine
+max_completion_length: 3072
+max_steps: -1
+num_generations: 16
+num_train_epochs: 1
+num_iterations: 1
+output_dir: data/Olmo3-7B-Instruct-MajorityVote-DAPO
+overwrite_output_dir: true
+per_device_eval_batch_size: 2
+per_device_train_batch_size: 2
+torch_empty_cache_steps: 1
+push_to_hub: false
+report_to:
+  - wandb
+
+# Reward setup: train on the majority-vote pseudo-label; keep `accuracy` at
+# weight 0.0 purely to log true accuracy alongside (it never affects training).
+reward_funcs:
+  - majority_vote
+  - accuracy
+reward_weights:
+  - 1.0   # majority-vote pseudo-label (the learning signal)
+  - 0.0   # ground-truth accuracy: MONITORING ONLY, no gradient
+majority_vote_min_agreement: 0.0
+
+save_strategy: "steps"
+save_total_limit: 6
+save_steps: 10
+seed: 7
+warmup_ratio: 0.1

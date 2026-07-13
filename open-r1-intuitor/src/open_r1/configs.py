@@ -146,7 +146,16 @@ class GRPOScriptArguments(trl.ScriptArguments):
     reward_funcs: list[str] = field(
         default_factory=lambda: [],
         metadata={
-            "help": "List of reward functions. Possible values: 'accuracy', 'format', 'reasoning_steps', 'cosine', 'repetition_penalty', 'length', tag_count', 'code', 'code_format'"
+            "help": "List of reward functions. Possible values: 'accuracy', 'format', 'majority_vote', 'reasoning_steps', 'cosine', 'repetition_penalty', 'length', tag_count', 'code', 'code_format'"
+        },
+    )
+    majority_vote_min_agreement: float = field(
+        default=0.0,
+        metadata={
+            "help": "For the 'majority_vote' (TTRL-style self-consistency) reward: minimum "
+            "fraction of a prompt group's parseable votes that the plurality answer must reach "
+            "for its pseudo-label to be trusted. Groups below this threshold get no signal "
+            "(all-zero reward). Default 0.0 always trusts the plurality."
         },
     )
     cosine_min_value_wrong: float = field(
@@ -267,7 +276,16 @@ class GatedGRPOScriptArguments(trl.ScriptArguments):
     reward_funcs: list[str] = field(
         default_factory=lambda: [],
         metadata={
-            "help": "List of reward functions. Possible values: 'accuracy', 'format', 'reasoning_steps', 'cosine', 'repetition_penalty', 'length', tag_count', 'code', 'code_format'"
+            "help": "List of reward functions. Possible values: 'accuracy', 'format', 'majority_vote', 'reasoning_steps', 'cosine', 'repetition_penalty', 'length', tag_count', 'code', 'code_format'"
+        },
+    )
+    majority_vote_min_agreement: float = field(
+        default=0.0,
+        metadata={
+            "help": "For the 'majority_vote' (TTRL-style self-consistency) reward: minimum "
+            "fraction of a prompt group's parseable votes that the plurality answer must reach "
+            "for its pseudo-label to be trusted. Groups below this threshold get no signal "
+            "(all-zero reward). Default 0.0 always trusts the plurality."
         },
     )
     cosine_min_value_wrong: float = field(

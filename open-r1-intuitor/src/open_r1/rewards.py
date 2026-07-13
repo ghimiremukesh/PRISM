@@ -132,6 +132,129 @@ def boxed_reward(completions, **kwargs):
     return [1.0 if pattern.match(text) else 0.0 for text in contents]
 
 
+def _parse_answer_for_vote(content: str):
+    """Parse a completion's final answer for majority voting.
+
+    Uses the SAME extraction configuration as ``accuracy_reward`` so that the
+    vote buckets are consistent with how correctness is measured elsewhere
+    (e.g. ``1/2`` and ``0.5`` are treated as the same answer). Returns the
+    ``math_verify`` parsed object (a list); an empty list means the answer could
+    not be parsed.
+    """
+    return parse(
+        content,
+        extraction_config=[
+            LatexExtractionConfig(
+                normalization_config=NormalizationConfig(
+                    nits=False,
+                    malformed_operators=False,
+                    basic_latex=True,
+                    equations=True,
+                    boxed="all",
+                    units=True,
+                ),
+                boxed_match_priority=0,
+                try_extract_without_anchor=False,
+            )
+        ],
+        extraction_mode="first_match",
+    )
+
+
+def get_majority_vote_reward(min_agreement: float = 0.0):
+    """Factory for a self-consistency / majority-vote (TTRL-style) reward.
+
+    This is a *label-free* reward: it never reads the ground-truth ``solution``.
+    For each prompt, the ``num_generations`` sampled completions are pooled, their
+    final answers are parsed and clustered by mathematical equivalence (via
+    ``math_verify.verify``), and the most frequent (plurality) answer becomes a
+    *pseudo-label*. Completions whose answer matches the pseudo-label receive
+    reward 1.0; all others (including unparseable ones) receive 0.0. This mirrors
+    the pseudo-labeling used by TTRL-style methods \\citep{zuo2025ttrl} and lets a
+    consensus signal be compared head-to-head against PRM / self-certainty.
+
+    Grouping note: the GRPO sampler emits all generations of a prompt as a
+    contiguous block, and the trainer passes the parallel ``prompts`` list to
+    every reward function. We therefore group by the (serialized) prompt, which
+    is robust without needing to know ``num_generations`` inside the reward.
+
+    Args:
+        min_agreement: minimum fraction of a group's *parseable* votes that the
+            plurality answer must reach for the pseudo-label to be trusted. If the
+            top answer does not reach this fraction, the whole group receives 0.0
+            (no learning signal), avoiding training on low-consensus pseudo-labels.
+            Default 0.0 always trusts the plurality.
+    """
+
+    def _prompt_key(prompt) -> str:
+        # Prompts are conversational (list of {role, content}) or plain strings.
+        if isinstance(prompt, str):
+            return prompt
+        try:
+            # Use the last user turn as the grouping key (the actual question).
+            for turn in reversed(prompt):
+                if turn.get("role") == "user":
+                    return turn["content"]
+            return json.dumps(prompt, sort_keys=True)
+        except Exception:
+            return str(prompt)
+
+    def majority_vote_reward(completions, prompts=None, **kwargs) -> list[float]:
+        contents = [completion[0]["content"] for completion in completions]
+        n = len(contents)
+        if prompts is None:
+            # Fall back to treating the whole batch as one group.
+            prompts = [None] * n
+        keys = [_prompt_key(p) for p in prompts]
+
+        # Pre-parse every completion once.
+        parsed = [_parse_answer_for_vote(c) for c in contents]
+
+        rewards = [0.0] * n
+        # Group indices by prompt key (groups are contiguous, but key-based
+        # grouping is equivalent and also merges any duplicate prompts).
+        groups: Dict[str, list] = {}
+        for idx, key in enumerate(keys):
+            groups.setdefault(key, []).append(idx)
+
+        for _, idxs in groups.items():
+            # Cluster the parseable answers by mathematical equivalence.
+            # Each cluster: {"rep": parsed_repr, "members": [indices]}.
+            clusters: list[dict] = []
+            for idx in idxs:
+                ans = parsed[idx]
+                if len(ans) == 0:
+                    continue  # unparseable -> casts no vote, stays 0.0
+                placed = False
+                for cluster in clusters:
+                    try:
+                        if verify(cluster["rep"], ans):
+                            cluster["members"].append(idx)
+                            placed = True
+                            break
+                    except Exception:
+                        # If verify errors on this pair, treat as non-matching.
+                        continue
+                if not placed:
+                    clusters.append({"rep": ans, "members": [idx]})
+
+            if not clusters:
+                continue  # no parseable answer in this group
+
+            num_votes = sum(len(c["members"]) for c in clusters)
+            # Plurality cluster (first-encountered wins ties -> deterministic).
+            winner = max(clusters, key=lambda c: len(c["members"]))
+            if num_votes > 0 and (len(winner["members"]) / num_votes) < min_agreement:
+                continue  # consensus too weak; give no signal to this group
+
+            for idx in winner["members"]:
+                rewards[idx] = 1.0
+
+        return rewards
+
+    return majority_vote_reward
+
+
 def noise_reward(
     completions: list[list[dict[str, str]]],
     **kwargs
@@ -637,6 +760,9 @@ def get_reward_funcs(script_args) -> list[Callable]:
         "accuracy": accuracy_reward,
         "format": format_reward,
         "boxed": boxed_reward,
+        "majority_vote": get_majority_vote_reward(
+            min_agreement=getattr(script_args, "majority_vote_min_agreement", 0.0),
+        ),
         "reasoning_steps": reasoning_steps_reward,
         "cosine": get_cosine_scaled_reward(
             min_value_wrong=script_args.cosine_min_value_wrong,

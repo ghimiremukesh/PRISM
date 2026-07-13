@@ -22,9 +22,11 @@ def get_tokenizer(model_args: ModelConfig, training_args: SFTConfig | GRPOConfig
 
 def get_model(model_args: ModelConfig, training_args: SFTConfig | GRPOConfig) -> AutoModelForCausalLM:
     """Get the model"""
-    torch_dtype = (
-        model_args.torch_dtype if model_args.torch_dtype in ["auto", None] else getattr(torch, model_args.torch_dtype)
-    )
+    # trl >= 0.20 renamed ModelConfig.torch_dtype to dtype; support both.
+    dtype = getattr(model_args, "torch_dtype", None)
+    if dtype is None:
+        dtype = getattr(model_args, "dtype", None)
+    torch_dtype = getattr(torch, dtype) if isinstance(dtype, str) and dtype != "auto" else dtype
     quantization_config = get_quantization_config(model_args)
     model_kwargs = dict(
         revision=model_args.model_revision,

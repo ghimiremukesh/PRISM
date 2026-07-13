@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 source ./openr1/bin/activate
-export WANDB_API_KEY=6690ae4dd209ea0517d035d7efd9c428ba921922
+export WANDB_API_KEY= # your_wandb_api_key_here
 export ACCELERATE_LOG_LEVEL=info
 export HF_TOKEN=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
 
